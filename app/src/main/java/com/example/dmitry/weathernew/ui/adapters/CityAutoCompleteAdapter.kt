@@ -8,9 +8,10 @@ import android.widget.BaseAdapter
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.TextView
-import com.example.dmitry.weathernew.MyApp
 import com.example.dmitry.weathernew.R
+import com.example.dmitry.weathernew.models.WeatherData
 import com.example.dmitry.weathernew.network.WeatherApiService
+import com.google.gson.Gson
 import io.reactivex.android.schedulers.AndroidSchedulers
 
 class CityAutoCompleteAdapter(private val context: Context) : BaseAdapter(), Filterable {
@@ -69,10 +70,18 @@ class CityAutoCompleteAdapter(private val context: Context) : BaseAdapter(), Fil
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ result ->
                     cityList.add(result.name + "," + result.sys.country)
-                    MyApp.currentWeatherData = result
+                    saveCurrentWeatherData(result)
                 }, { error ->
                     error.printStackTrace()
                 })
         return cityList
+    }
+
+    private fun saveCurrentWeatherData(weatherData: WeatherData) {
+        val sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE)
+        sharedPref.edit()
+                .putString(context.getString(R.string.weather_data_key), Gson().toJson(weatherData))
+                .putInt(context.getString(R.string.city_id_key), weatherData.id)
+                .apply()
     }
 }

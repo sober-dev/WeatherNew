@@ -20,7 +20,7 @@ interface WeatherApiService {
 
     @GET("weather")
     fun getWeatherDataByCityId(
-            @Query("id") cityName: String,
+            @Query("id") cityId: Int,
             @Query("appid") apiKey: String
     ): Observable<WeatherData>
 
